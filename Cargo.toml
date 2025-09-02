@@ -40,7 +40,10 @@ tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
 
 [features]
-bench = []
+default = ["all"]
+utils = []
+models = []
+all = ["utils", "models"]  
 
 [profile.bench]
 debug = true
