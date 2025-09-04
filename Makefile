@@ -15,8 +15,11 @@ endif
 	@echo "Updating versions to $(VERSION)..."
 	sed -i.bak 's/^version = ".*"/version = "$(VERSION)"/' ./Cargo.toml && rm -f ./Cargo.toml.bak
 
+	@echo "Generating updated Cargo.lock..."
+	cargo check  # This will update Cargo.lock with the new version
+
 	@echo "Waiting some seconds before commiting..."
-	sleep 10
+	sleep 5
 
 	git add -A
 	git commit -m "$(VERSION)" || true
