@@ -87,7 +87,7 @@ pub struct AppError {
   pub message: String,
   pub detailes: String,
   pub request_id: Option<String>,
-  pub status_code: Option<i32>,
+  pub status_code: i32,
   pub tr_params: OptionalParams,
   pub skip_translation: bool,
   pub error: OptionalErr,
@@ -104,15 +104,12 @@ impl AppError {
     id: impl Into<String>,
     id_params: OptionalParams,
     details: impl Into<String>,
-    status_code: Option<i32>,
+    status_code: i32,
     mut errors: Option<AppErrorErrors>,
   ) -> Self {
     if errors.is_none() {
-      errors = Some(AppErrorErrors {
-        err: None,
-        errors_internal: None,
-        errors_nested_internal: None,
-      });
+      errors =
+        Some(AppErrorErrors { err: None, errors_internal: None, errors_nested_internal: None });
     };
 
     let unwraped = {
@@ -137,16 +134,10 @@ impl AppError {
       errors_nested_internal: unwraped.2,
     };
 
-    let boxed_tr = Box::new(
-      |lang: &str, id: &str, params: &HashMap<String, serde_json::Value>| {
-        let params_option = if params.is_empty() {
-          None
-        } else {
-          Some(params.clone())
-        };
-        tr(lang, id, params_option).map_err(|e| Box::new(e) as Box<dyn Error>)
-      },
-    );
+    let boxed_tr = Box::new(|lang: &str, id: &str, params: &HashMap<String, serde_json::Value>| {
+      let params_option = if params.is_empty() { None } else { Some(params.clone()) };
+      tr(lang, id, params_option).map_err(|e| Box::new(e) as Box<dyn Error>)
+    });
 
     err.translate(Some(boxed_tr));
     err
@@ -213,7 +204,7 @@ impl AppError {
       message: String::new(),
       detailes: String::new(),
       request_id: None,
-      status_code: None,
+      status_code: Code::Ok as i32,
       tr_params: None,
       skip_translation: false,
       error: None,
@@ -238,28 +229,23 @@ impl AppError {
       r#where: self.path.clone(),
       message: self.message.clone(),
       detailed_error: self.detailes.clone(),
-      status_code: self.status_code.unwrap_or(0) as i32,
+      status_code: self.status_code as i32,
       skip_translation: self.skip_translation,
       request_id: self.request_id.clone().unwrap_or_default(),
-      errors: Some(StringMap {
-        data: self.errors.clone().unwrap_or_default(),
-      }),
+      errors: Some(StringMap { data: self.errors.clone().unwrap_or_default() }),
       errors_nested: Some(NestedStringMap { data: nested }),
     }
   }
 
   pub fn to_internal(self, ctx: Arc<Context>, path: String) -> Self {
-    let errors = AppErrorErrors {
-      err: self.error,
-      ..Default::default()
-    };
+    let errors = AppErrorErrors { err: self.error, ..Default::default() };
     Self::new(
       ctx,
       path,
       MSG_ID_ERR_INTERNAL,
       None,
       self.detailes,
-      Some(Code::Internal.into()),
+      Code::Internal.into(),
       Some(errors),
     )
   }
@@ -276,7 +262,7 @@ pub fn app_error_from_proto_app_error(ctx: Arc<Context>, ae: &AppErrorProto) -> 
     message: ae.message.clone(),
     detailes: ae.detailed_error.clone(),
     request_id: Some(ae.request_id.clone()).filter(|s| !s.is_empty()),
-    status_code: Some(ae.status_code as i32),
+    status_code: ae.status_code as i32,
     tr_params: None,
     skip_translation: ae.skip_translation,
     error: None,
@@ -290,10 +276,7 @@ pub fn app_error_from_proto_app_error(ctx: Arc<Context>, ae: &AppErrorProto) -> 
 /// Convert proto params to HashMaps
 pub fn convert_proto_params(
   ae: &AppErrorProto,
-) -> (
-  Option<HashMap<String, String>>,
-  Option<HashMap<String, HashMap<String, String>>>,
-) {
+) -> (Option<HashMap<String, String>>, Option<HashMap<String, HashMap<String, String>>>) {
   let mut shallow = HashMap::new();
   let mut nested = HashMap::new();
 
@@ -318,9 +301,6 @@ impl fmt::Display for AppError {
 
 impl Error for AppError {
   fn source(&self) -> Option<&(dyn Error + 'static)> {
-    self
-      .error
-      .as_ref()
-      .map(|e| e.as_ref() as &(dyn Error + 'static))
+    self.error.as_ref().map(|e| e.as_ref() as &(dyn Error + 'static))
   }
 }
