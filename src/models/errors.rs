@@ -66,45 +66,75 @@ impl Error for InternalError {
   }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppErrorError {
+  pub id: String,
+  pub params: Option<HashMap<String, Value>>,
+}
+
+#[derive(Debug, Default)]
+pub struct AppErrorErrors {
+  pub err: OptionalErr,
+  pub errors_internal: Option<HashMap<String, AppErrorError>>,
+  pub errors_nested_internal: Option<HashMap<String, HashMap<String, AppErrorError>>>,
+}
+
 #[derive(Debug)]
 pub struct AppError {
   pub ctx: Arc<Context>,
   pub id: String,
+  pub path: String,
   pub message: String,
   pub detailes: String,
   pub request_id: Option<String>,
   pub status_code: Option<i32>,
   pub tr_params: OptionalParams,
-  pub params: HashMap<String, String>,
-  pub nested_params: HashMap<String, HashMap<String, String>>,
-  pub where_: String,
   pub skip_translation: bool,
-  pub error: Option<Box<dyn Error + Send + Sync>>,
+  pub error: OptionalErr,
+  pub errors: Option<HashMap<String, String>>,
+  pub errors_nested: Option<HashMap<String, HashMap<String, String>>>,
+  pub errors_internal: Option<HashMap<String, AppErrorError>>,
+  pub errors_nested_internal: Option<HashMap<String, HashMap<String, AppErrorError>>>,
 }
 
 impl AppError {
   pub fn new(
     ctx: Arc<Context>,
-    where_: impl Into<String>,
+    path: impl Into<String>,
     id: impl Into<String>,
-    tr_params: OptionalParams,
+    id_params: OptionalParams,
     details: impl Into<String>,
     status_code: Option<i32>,
-    error: Option<Box<dyn Error + Send + Sync>>,
+    mut errors: Option<AppErrorErrors>,
   ) -> Self {
+    if errors.is_none() {
+      errors = Some(AppErrorErrors {
+        err: None,
+        errors_internal: None,
+        errors_nested_internal: None,
+      });
+    };
+
+    let unwraped = {
+      let e = errors.unwrap();
+      (e.err, e.errors_internal, e.errors_nested_internal)
+    };
+
     let mut err = Self {
       ctx,
       id: id.into(),
+      path: path.into(),
       message: "".to_string(),
       detailes: details.into(),
       request_id: None,
       status_code,
-      tr_params,
-      params: HashMap::new(),
-      nested_params: HashMap::new(),
-      where_: where_.into(),
+      tr_params: id_params,
       skip_translation: false,
-      error,
+      error: unwraped.0,
+      errors: None,
+      errors_nested: None,
+      errors_internal: unwraped.1,
+      errors_nested_internal: unwraped.2,
     };
 
     let boxed_tr = Box::new(
@@ -125,8 +155,8 @@ impl AppError {
   pub fn error_string(&self) -> String {
     let mut s = String::new();
 
-    if !self.where_.is_empty() {
-      s.push_str(&self.where_);
+    if !self.path.is_empty() {
+      s.push_str(&self.path);
       s.push_str(": ");
     }
 
@@ -178,43 +208,51 @@ impl AppError {
   pub fn default() -> Self {
     Self {
       ctx: Arc::new(Context::default()),
+      path: String::new(),
       id: String::new(),
       message: String::new(),
       detailes: String::new(),
       request_id: None,
       status_code: None,
       tr_params: None,
-      params: HashMap::new(),
-      nested_params: HashMap::new(),
-      where_: String::new(),
       skip_translation: false,
       error: None,
+      errors: None,
+      errors_nested: None,
+      errors_internal: None,
+      errors_nested_internal: None,
     }
   }
 
-  // Convert to proto-generated struct (replace with your proto types)
+  /// Convert to proto-generated struct
   pub fn to_proto(&self) -> AppErrorProto {
-    let mut nested = HashMap::with_capacity(self.nested_params.len());
-    for (k, v) in &self.nested_params {
-      nested.insert(k.clone(), StringMap { data: v.clone() });
+    let mut nested = HashMap::new();
+    if let Some(errors) = &self.errors_nested {
+      for (k, v) in errors {
+        nested.insert(k.clone(), StringMap { data: v.clone() });
+      }
     }
 
     AppErrorProto {
       id: self.id.clone(),
+      r#where: self.path.clone(),
       message: self.message.clone(),
       detailed_error: self.detailes.clone(),
       status_code: self.status_code.unwrap_or(0) as i32,
-      r#where: self.where_.clone(),
       skip_translation: self.skip_translation,
+      request_id: self.request_id.clone().unwrap_or_default(),
       errors: Some(StringMap {
-        data: self.params.clone(),
+        data: self.errors.clone().unwrap_or_default(),
       }),
       errors_nested: Some(NestedStringMap { data: nested }),
-      request_id: self.request_id.clone().unwrap_or_default(),
     }
   }
 
   pub fn to_internal(self, ctx: Arc<Context>, path: String) -> Self {
+    let errors = AppErrorErrors {
+      err: self.error,
+      ..Default::default()
+    };
     Self::new(
       ctx,
       path,
@@ -222,17 +260,39 @@ impl AppError {
       None,
       self.detailes,
       Some(Code::Internal.into()),
-      self.error,
+      Some(errors),
     )
   }
 }
 
-// Convert proto params to HashMaps
+/// Convert from proto-generated struct
+pub fn app_error_from_proto_app_error(ctx: Arc<Context>, ae: &AppErrorProto) -> AppError {
+  let (errors, nested) = convert_proto_params(ae);
+
+  AppError {
+    ctx,
+    id: ae.id.clone(),
+    path: ae.r#where.clone(),
+    message: ae.message.clone(),
+    detailes: ae.detailed_error.clone(),
+    request_id: Some(ae.request_id.clone()).filter(|s| !s.is_empty()),
+    status_code: Some(ae.status_code as i32),
+    tr_params: None,
+    skip_translation: ae.skip_translation,
+    error: None,
+    errors,
+    errors_nested: nested,
+    errors_internal: None,
+    errors_nested_internal: None,
+  }
+}
+
+/// Convert proto params to HashMaps
 pub fn convert_proto_params(
   ae: &AppErrorProto,
 ) -> (
-  HashMap<String, String>,
-  HashMap<String, HashMap<String, String>>,
+  Option<HashMap<String, String>>,
+  Option<HashMap<String, HashMap<String, String>>>,
 ) {
   let mut shallow = HashMap::new();
   let mut nested = HashMap::new();
@@ -246,31 +306,7 @@ pub fn convert_proto_params(
     }
   }
 
-  (shallow, nested)
-}
-
-// Convert from proto-generated struct
-pub fn app_error_from_proto_app_error(ctx: Arc<Context>, ae: &AppErrorProto) -> AppError {
-  let (params, nested) = convert_proto_params(ae);
-
-  AppError {
-    ctx,
-    id: ae.id.clone(),
-    message: ae.message.clone(),
-    detailes: ae.detailed_error.clone(),
-    request_id: if ae.request_id.is_empty() {
-      None
-    } else {
-      Some(ae.request_id.clone())
-    },
-    status_code: Some(ae.status_code as i32),
-    tr_params: None,
-    params,
-    nested_params: nested,
-    where_: ae.r#where.clone(),
-    skip_translation: ae.skip_translation,
-    error: None,
-  }
+  (Some(shallow), Some(nested))
 }
 
 // Implement std::fmt::Display for error formatting
