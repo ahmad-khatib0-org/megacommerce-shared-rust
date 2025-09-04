@@ -15,6 +15,9 @@ endif
 	@echo "Updating versions to $(VERSION)..."
 	sed -i.bak 's/^version = ".*"/version = "$(VERSION)"/' ./Cargo.toml && rm -f ./Cargo.toml.bak
 
+	@echo "Waiting some seconds before commiting..."
+	sleep 10
+
 	git add -A
 	git commit -m "$(VERSION)" || true
 	
