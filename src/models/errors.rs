@@ -60,6 +60,12 @@ pub struct InternalError {
   pub path: String,
 }
 
+impl InternalError {
+  pub fn new(path: String, err: BoxedErr, err_type: ErrorType, temp: bool, msg: String) -> Self {
+    Self { err, err_type, temp, msg, path }
+  }
+}
+
 impl Error for InternalError {
   fn source(&self) -> Option<&(dyn Error + 'static)> {
     Some(self.err.as_ref())
