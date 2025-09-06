@@ -715,13 +715,13 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "chrono",
  "derive_more",
  "http",
  "megacommerce-proto",
- "sanitize-derive",
+ "megacommerce-shared-sanitize-derive",
  "scopeguard",
  "serde",
  "serde_json",
@@ -735,6 +735,18 @@ dependencies = [
  "tracing-subscriber",
  "ulid",
  "unidecode",
+]
+
+[[package]]
+name = "megacommerce-shared-sanitize-derive"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14581cccfec4feb25d30cb197291bf76dcbe15617ce75712f6b14486246c492f"
+dependencies = [
+ "megacommerce-proto",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -1164,16 +1176,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
-]
-
-[[package]]
-name = "sanitize-derive"
-version = "0.1.1"
-dependencies = [
- "megacommerce-proto",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
