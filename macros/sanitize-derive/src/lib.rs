@@ -1,29 +1,30 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput};
+use syn::{parse_macro_input, punctuated::Punctuated, Path, Token};
 
-#[proc_macro_derive(SanitizeAppError)]
+#[proc_macro]
 pub fn sanitize_app_error(input: TokenStream) -> TokenStream {
-  let input = parse_macro_input!(input as DeriveInput);
-  let name = input.ident;
+  // Parse: a list of paths separated by commas
+  let args = parse_macro_input!(input with Punctuated::<Path, Token![,]>::parse_terminated);
 
-  // By convention we assume each response has a `response` oneof with an Error variant.
-  // Prost generates an enum called `<lowercase_struct_name>::Response`
-  // where one variant is `Error(AppError)`.
-  let mod_name =
-    syn::Ident::new(&format!("{}::response", name.to_string().to_lowercase()), name.span());
-  let enum_name = syn::Ident::new("Response", name.span());
+  if args.len() != 2 {
+    return syn::Error::new_spanned(args, "expected 2 arguments: (ResponseType, ResponseEnumPath)")
+      .to_compile_error()
+      .into();
+  }
+
+  let ty = &args[0]; // e.g. EmailConfirmationResponse
+  let enum_ty = &args[1]; // e.g. email_confirmation_response::Response
 
   let expanded = quote! {
-      impl SanitizeAppError for #name {
+      impl SanitizeAppError for #ty {
           fn sanitize_app_error_fields(&mut self) {
-              if let Some(#mod_name::#enum_name::Error(err)) = self.response.take() {
-                  self.response =
-                      Some(#mod_name::#enum_name::Error(sanitize_app_error(&err)));
+              if let Some(#enum_ty::Error(err)) = self.response.take() {
+                  self.response = Some(#enum_ty::Error(sanitize_app_error(&err)));
               }
           }
       }
   };
 
-  TokenStream::from(expanded)
+  expanded.into()
 }
