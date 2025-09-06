@@ -1,6 +1,6 @@
 [package]
 name = "megacommerce-shared"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2024"
 description = "Shared utils, models, config, ... for MegaCommerce Platform"
 license = "MIT OR Apache-2.0"
@@ -11,7 +11,7 @@ categories = ["api-bindings", "network-programming"]
 publish = true
 
 [dependencies]
-megacommerce-shared-sanitize-derive = { version = "0.1.1", optional = true }
+megacommerce-shared-sanitize-derive = { version = "0.1.2", optional = true }
 ## core
 megacommerce-proto = "0.1.61"
 tokio = {version = "1.45.1", features = ["full"]}

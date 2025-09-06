@@ -5,4 +5,4 @@ pub mod models;
 pub mod utils;
 
 #[cfg(any(feature = "macros", feature = "all"))]
-pub use megacommerce_shared_sanitize_derive::SanitizeAppError;
+pub use megacommerce_shared_sanitize_derive::sanitize_app_error;
