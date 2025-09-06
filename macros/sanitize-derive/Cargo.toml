@@ -1,0 +1,15 @@
+[package]
+name = "sanitize-derive"
+version = "0.1.1"
+edition = "2024"
+description = "Procedural macros to sanitize the returned AppError"
+license = "MIT OR Apache-2.0"
+publish = false 
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.101"
+quote = "1.0.40"
+syn = { version = "2.0.106", features = ["full", "extra-traits"] }
