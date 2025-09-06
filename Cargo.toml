@@ -1,6 +1,6 @@
 [package]
 name = "megacommerce-shared"
-version = "0.1.9"
+version = "0.2.1"
 edition = "2024"
 description = "Shared utils, models, config, ... for MegaCommerce Platform"
 license = "MIT OR Apache-2.0"
@@ -12,6 +12,7 @@ publish = true
 
 
 [dependencies]
+sanitize-derive = {path = "macros/sanitize-derive"}
 ## core
 megacommerce-proto = "0.1.61"
 tokio = {version = "1.45.1", features = ["full"]}
@@ -43,7 +44,8 @@ tracing-subscriber = "0.3.19"
 default = ["all"]
 utils = []
 models = []
-all = ["utils", "models"]  
+macros = []
+all = ["utils", "models", "macros"]  
 
 [profile.bench]
 debug = true
