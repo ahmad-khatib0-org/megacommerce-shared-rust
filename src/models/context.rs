@@ -74,15 +74,7 @@ impl Context {
     user_agent: String,
     accept_language: String,
   ) -> Self {
-    Self {
-      session,
-      request_id,
-      ip_address,
-      x_forwarded_for,
-      path,
-      user_agent,
-      accept_language,
-    }
+    Self { session, request_id, ip_address, x_forwarded_for, path, user_agent, accept_language }
   }
 
   pub fn clone(&self) -> Self {
@@ -119,4 +111,3 @@ impl Context {
     &self.accept_language
   }
 }
-

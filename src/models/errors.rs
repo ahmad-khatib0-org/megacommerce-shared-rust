@@ -226,7 +226,7 @@ impl AppError {
     let mut nested = HashMap::new();
     if let Some(errors) = &self.errors_nested {
       for (k, v) in errors {
-        nested.insert(k.clone(), StringMap { data: v.clone() });
+        nested.insert(k.clone(), StringMap { values: v.clone() });
       }
     }
 
@@ -238,7 +238,7 @@ impl AppError {
       status_code: self.status_code as i32,
       skip_translation: self.skip_translation,
       request_id: self.request_id.clone().unwrap_or_default(),
-      errors: Some(StringMap { data: self.errors.clone().unwrap_or_default() }),
+      errors: Some(StringMap { values: self.errors.clone().unwrap_or_default() }),
       errors_nested: Some(NestedStringMap { data: nested }),
     }
   }
@@ -287,11 +287,11 @@ pub fn convert_proto_params(
   let mut nested = HashMap::new();
 
   if let Some(ref p) = ae.errors {
-    shallow.extend(p.data.clone());
+    shallow.extend(p.values.clone());
   }
   if let Some(ref n) = ae.errors_nested {
     for (k, v) in &n.data {
-      nested.insert(k.clone(), v.data.clone());
+      nested.insert(k.clone(), v.values.clone());
     }
   }
 
