@@ -30,6 +30,11 @@ pub enum ErrorType {
   Internal,
   DBConnectionError,
   ConfigError,
+  HttpRequestError,
+  HttpResponseError,
+  HttpEmptyResponse,
+  MissingField,
+  InvalidData,
 }
 
 impl fmt::Display for ErrorType {
@@ -46,6 +51,11 @@ impl fmt::Display for ErrorType {
       ErrorType::Privileges => write!(f, "insufficient_privilege"),
       ErrorType::ConfigError => write!(f, "config_error"),
       ErrorType::Internal => write!(f, "internal_error"),
+      ErrorType::HttpRequestError => write!(f, "http_request_error"),
+      ErrorType::HttpResponseError => write!(f, "http_response_error"),
+      ErrorType::HttpEmptyResponse => write!(f, "http_empty_response"),
+      ErrorType::MissingField => write!(f, "missing_field"),
+      ErrorType::InvalidData => write!(f, "invalid_data"),
     }
   }
 }
