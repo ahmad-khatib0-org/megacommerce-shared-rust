@@ -365,9 +365,9 @@ checksum = "47e1ffaa40ddd1f3ed91f717a33c8c0ee23fff369e3aa8772b9605cc1d22f4c3"
 
 [[package]]
 name = "megacommerce-proto"
-version = "0.1.66"
+version = "0.2.63"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "921a987da397439b158c851cbecbff2a10fbd4934b0e2b858c2705e35858d0cf"
+checksum = "51351e6f7e09836f553efe1336c5313b79e3d2b113c97c6c6f25d39c224562b6"
 dependencies = [
  "prost 0.13.5",
  "prost-types",
@@ -377,7 +377,7 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared-sanitize-derive"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "megacommerce-proto",
  "proc-macro2",
