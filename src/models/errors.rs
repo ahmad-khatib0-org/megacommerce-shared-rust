@@ -35,6 +35,8 @@ pub enum ErrorType {
   HttpEmptyResponse,
   MissingField,
   InvalidData,
+  TimedOut,
+  TaskFailed,
 }
 
 impl fmt::Display for ErrorType {
@@ -56,6 +58,8 @@ impl fmt::Display for ErrorType {
       ErrorType::HttpEmptyResponse => write!(f, "http_empty_response"),
       ErrorType::MissingField => write!(f, "missing_field"),
       ErrorType::InvalidData => write!(f, "invalid_data"),
+      ErrorType::TimedOut => write!(f, "timed_out"),
+      ErrorType::TaskFailed => write!(f, "task_failed"),
     }
   }
 }
