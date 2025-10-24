@@ -1110,13 +1110,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "megacommerce-proto"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "45bd313ba7b1bd0d58fba3f1c90bde2a980ee7f624d60e8141a7fecb098fdd70"
+dependencies = [
+ "prost 0.13.5",
+ "prost-types",
+ "serde",
+ "tonic",
+]
+
+[[package]]
 name = "megacommerce-shared"
-version = "0.4.37"
+version = "0.4.39"
 dependencies = [
  "chrono",
  "derive_more",
  "http",
- "megacommerce-proto",
+ "megacommerce-proto 0.2.63",
  "megacommerce-shared-sanitize-derive",
  "regex",
  "scopeguard",
@@ -1137,11 +1149,11 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared-sanitize-derive"
-version = "0.1.3"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b89a5abf8109834abdeab2722a8aca25fe66326c9bf0a1d54b95de10cb5879a"
+checksum = "ffc3dc2fed47b34cab76dfe7de429ab7d06add64132b7c20d1e0f6a4357efa4d"
 dependencies = [
- "megacommerce-proto",
+ "megacommerce-proto 0.3.1",
  "proc-macro2",
  "quote",
  "syn",
