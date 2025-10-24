@@ -1,6 +1,6 @@
 [package]
 name = "megacommerce-shared"
-version = "0.4.39"
+version = "0.4.41"
 edition = "2024"
 description = "Shared utils, models, config, ... for MegaCommerce Platform"
 license = "MIT OR Apache-2.0"
@@ -13,7 +13,7 @@ publish = true
 [dependencies]
 megacommerce-shared-sanitize-derive = { version = "0.1.4", optional = true }
 ## core
-megacommerce-proto = "0.2.55"
+megacommerce-proto = "0.3.1"
 sqlx = { version = "0.8.6", features = [
   "postgres",
   "runtime-tokio",
