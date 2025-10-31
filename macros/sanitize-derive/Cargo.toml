@@ -1,6 +1,6 @@
 [package]
 name = "megacommerce-shared-sanitize-derive"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 description = "Procedural macros to sanitize the returned AppError"
 license = "MIT OR Apache-2.0"

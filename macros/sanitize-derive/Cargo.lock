@@ -377,7 +377,7 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared-sanitize-derive"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "megacommerce-proto",
  "proc-macro2",
