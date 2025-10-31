@@ -1111,7 +1111,7 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared"
-version = "0.4.42"
+version = "0.4.51"
 dependencies = [
  "chrono",
  "derive_more",
@@ -1137,9 +1137,9 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared-sanitize-derive"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffc3dc2fed47b34cab76dfe7de429ab7d06add64132b7c20d1e0f6a4357efa4d"
+checksum = "fb90a63e1d3cb6b56e8f03f4967841def2d893029c51a6ac327f86b2ac53514a"
 dependencies = [
  "megacommerce-proto",
  "proc-macro2",
