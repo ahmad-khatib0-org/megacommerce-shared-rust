@@ -37,6 +37,8 @@ pub enum ErrorType {
   InvalidData,
   TimedOut,
   TaskFailed,
+  Base64Invalid,
+  RegexInvalid,
 }
 
 impl fmt::Display for ErrorType {
@@ -60,8 +62,17 @@ impl fmt::Display for ErrorType {
       ErrorType::InvalidData => write!(f, "invalid_data"),
       ErrorType::TimedOut => write!(f, "timed_out"),
       ErrorType::TaskFailed => write!(f, "task_failed"),
+      ErrorType::Base64Invalid => write!(f, "base64_invalid"),
+      ErrorType::RegexInvalid => write!(f, "regex_invalid"),
     }
   }
+}
+
+#[derive(Debug)]
+pub struct SimpleError {
+  pub message: String,
+  pub _type: ErrorType,
+  pub err: BoxedErr,
 }
 
 #[derive(Debug, Display)]

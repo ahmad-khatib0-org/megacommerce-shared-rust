@@ -1429,7 +1429,7 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared"
-version = "0.4.61"
+version = "0.4.65"
 dependencies = [
  "base64",
  "chrono",
@@ -1443,6 +1443,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "sha2",
  "sqlx",
  "tera",
  "thiserror 2.0.16",
