@@ -39,6 +39,7 @@ pub enum ErrorType {
   TaskFailed,
   Base64Invalid,
   RegexInvalid,
+  InvalidNumber,
 }
 
 impl fmt::Display for ErrorType {
@@ -64,6 +65,7 @@ impl fmt::Display for ErrorType {
       ErrorType::TaskFailed => write!(f, "task_failed"),
       ErrorType::Base64Invalid => write!(f, "base64_invalid"),
       ErrorType::RegexInvalid => write!(f, "regex_invalid"),
+      ErrorType::InvalidNumber => write!(f, "invalid_number"),
     }
   }
 }
