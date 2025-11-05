@@ -1,3 +1,5 @@
+use std::fmt;
+
 use megacommerce_proto::Any;
 
 #[derive(Debug)]
@@ -46,5 +48,32 @@ pub fn grpc_deserialize_any(any: &Any) -> AnyValue {
       .unwrap_or(AnyValue::Unknown(any.value.clone())),
     "type.googleapis.com/google.protobuf.BytesValue" => AnyValue::Bytes(any.value.clone()),
     _ => AnyValue::Unknown(any.value.clone()),
+  }
+}
+
+impl fmt::Display for AnyValue {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      AnyValue::String(s) => write!(f, "string:\"{}\"", s),
+      AnyValue::Bool(b) => write!(f, "bool:{}", b),
+      AnyValue::Int32(i) => write!(f, "i32:{}", i),
+      AnyValue::Int64(i) => write!(f, "i64:{}", i),
+      AnyValue::Float(n) => write!(f, "float:{}", n),
+      AnyValue::Double(n) => write!(f, "double:{}", n),
+      AnyValue::Bytes(bytes) => {
+        if bytes.len() <= 8 {
+          write!(f, "bytes:{}", hex::encode(bytes))
+        } else {
+          write!(f, "bytes:{}...", hex::encode(&bytes[..8]))
+        }
+      }
+      AnyValue::Unknown(bytes) => {
+        if bytes.len() <= 8 {
+          write!(f, "unknown:{}", hex::encode(bytes))
+        } else {
+          write!(f, "unknown:{}...", hex::encode(&bytes[..8]))
+        }
+      }
+    }
   }
 }

@@ -1429,11 +1429,12 @@ dependencies = [
 
 [[package]]
 name = "megacommerce-shared"
-version = "0.4.67"
+version = "0.4.68"
 dependencies = [
  "base64",
  "chrono",
  "derive_more",
+ "hex",
  "http",
  "image",
  "megacommerce-proto",
