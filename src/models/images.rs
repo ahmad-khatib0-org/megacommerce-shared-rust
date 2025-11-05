@@ -19,6 +19,7 @@ pub struct ImageValidationResult {
   pub dimensions: (u32, u32),
   pub size_bytes: usize,
   pub is_valid: bool,
+  pub decoded_data: Vec<u8>,
 }
 
 impl Default for ImageValidationConfig {
@@ -111,6 +112,11 @@ pub fn validate_base64_image(
     )));
   }
 
-  Ok(ImageValidationResult { format, dimensions, size_bytes: decoded_data.len(), is_valid: true })
+  Ok(ImageValidationResult {
+    format,
+    dimensions,
+    size_bytes: decoded_data.len(),
+    is_valid: true,
+    decoded_data,
+  })
 }
-
