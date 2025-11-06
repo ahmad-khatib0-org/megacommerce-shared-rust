@@ -2,7 +2,7 @@ use std::fmt;
 
 use megacommerce_proto::Any;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AnyValue {
   String(String),
   Bool(bool),
@@ -212,5 +212,200 @@ impl fmt::Display for AnyValue {
         }
       }
     }
+  }
+}
+
+pub trait AnyExt {
+  fn from_string(s: String) -> Any;
+  fn from_str(s: &str) -> Any;
+  fn from_bool(b: bool) -> Any;
+  fn from_int32(i: i32) -> Any;
+  fn from_int64(i: i64) -> Any;
+  fn from_float(f: f32) -> Any;
+  fn from_double(d: f64) -> Any;
+  fn from_bytes(bytes: Vec<u8>) -> Any;
+  fn from_slice(slice: &[u8]) -> Any;
+  fn from_value<T: Into<AnyValue>>(value: T) -> Any;
+
+  // Type checking methods
+  fn is_string(&self) -> bool;
+  fn is_bool(&self) -> bool;
+  fn is_int32(&self) -> bool;
+  fn is_int64(&self) -> bool;
+  fn is_float(&self) -> bool;
+  fn is_double(&self) -> bool;
+  fn is_bytes(&self) -> bool;
+  fn is_unknown(&self) -> bool;
+}
+
+impl AnyExt for Any {
+  fn from_string(s: String) -> Any {
+    Any {
+      type_url: "type.googleapis.com/google.protobuf.StringValue".to_string(),
+      value: s.into_bytes(),
+    }
+  }
+
+  fn from_str(s: &str) -> Any {
+    Self::from_string(s.to_string())
+  }
+
+  fn from_bool(b: bool) -> Any {
+    Any {
+      type_url: "type.googleapis.com/google.protobuf.BoolValue".to_string(),
+      value: vec![b as u8],
+    }
+  }
+
+  fn from_int32(i: i32) -> Any {
+    Any {
+      type_url: "type.googleapis.com/google.protobuf.Int32Value".to_string(),
+      value: i.to_le_bytes().to_vec(),
+    }
+  }
+
+  fn from_int64(i: i64) -> Any {
+    Any {
+      type_url: "type.googleapis.com/google.protobuf.Int64Value".to_string(),
+      value: i.to_le_bytes().to_vec(),
+    }
+  }
+
+  fn from_float(f: f32) -> Any {
+    Any {
+      type_url: "type.googleapis.com/google.protobuf.FloatValue".to_string(),
+      value: f.to_le_bytes().to_vec(),
+    }
+  }
+
+  fn from_double(d: f64) -> Any {
+    Any {
+      type_url: "type.googleapis.com/google.protobuf.DoubleValue".to_string(),
+      value: d.to_le_bytes().to_vec(),
+    }
+  }
+
+  fn from_bytes(bytes: Vec<u8>) -> Any {
+    Any { type_url: "type.googleapis.com/google.protobuf.BytesValue".to_string(), value: bytes }
+  }
+
+  fn from_slice(slice: &[u8]) -> Any {
+    Self::from_bytes(slice.to_vec())
+  }
+
+  fn from_value<T: Into<AnyValue>>(value: T) -> Any {
+    match value.into() {
+      AnyValue::String(s) => Self::from_string(s),
+      AnyValue::Bool(b) => Self::from_bool(b),
+      AnyValue::Int32(i) => Self::from_int32(i),
+      AnyValue::Int64(i) => Self::from_int64(i),
+      AnyValue::Float(f) => Self::from_float(f),
+      AnyValue::Double(d) => Self::from_double(d),
+      AnyValue::Bytes(bytes) => Self::from_bytes(bytes),
+      AnyValue::Unknown(bytes) => Any { type_url: "unknown".to_string(), value: bytes },
+    }
+  }
+
+  fn is_string(&self) -> bool {
+    self.type_url == "type.googleapis.com/google.protobuf.StringValue"
+  }
+
+  fn is_bool(&self) -> bool {
+    self.type_url == "type.googleapis.com/google.protobuf.BoolValue"
+  }
+
+  fn is_int32(&self) -> bool {
+    self.type_url == "type.googleapis.com/google.protobuf.Int32Value"
+  }
+
+  fn is_int64(&self) -> bool {
+    self.type_url == "type.googleapis.com/google.protobuf.Int64Value"
+  }
+
+  fn is_float(&self) -> bool {
+    self.type_url == "type.googleapis.com/google.protobuf.FloatValue"
+  }
+
+  fn is_double(&self) -> bool {
+    self.type_url == "type.googleapis.com/google.protobuf.DoubleValue"
+  }
+
+  fn is_bytes(&self) -> bool {
+    self.type_url == "type.googleapis.com/google.protobuf.BytesValue"
+  }
+
+  fn is_unknown(&self) -> bool {
+    !self.is_string()
+      && !self.is_bool()
+      && !self.is_int32()
+      && !self.is_int64()
+      && !self.is_float()
+      && !self.is_double()
+      && !self.is_bytes()
+  }
+}
+
+// Separate trait for conversions
+pub trait ToAny {
+  fn to_any(&self) -> Any;
+}
+
+impl ToAny for String {
+  fn to_any(&self) -> Any {
+    Any::from_string(self.clone())
+  }
+}
+
+impl ToAny for &str {
+  fn to_any(&self) -> Any {
+    Any::from_str(self)
+  }
+}
+
+impl ToAny for bool {
+  fn to_any(&self) -> Any {
+    Any::from_bool(*self)
+  }
+}
+
+impl ToAny for i32 {
+  fn to_any(&self) -> Any {
+    Any::from_int32(*self)
+  }
+}
+
+impl ToAny for i64 {
+  fn to_any(&self) -> Any {
+    Any::from_int64(*self)
+  }
+}
+
+impl ToAny for f32 {
+  fn to_any(&self) -> Any {
+    Any::from_float(*self)
+  }
+}
+
+impl ToAny for f64 {
+  fn to_any(&self) -> Any {
+    Any::from_double(*self)
+  }
+}
+
+impl ToAny for Vec<u8> {
+  fn to_any(&self) -> Any {
+    Any::from_bytes(self.clone())
+  }
+}
+
+impl ToAny for &[u8] {
+  fn to_any(&self) -> Any {
+    Any::from_slice(self)
+  }
+}
+
+impl ToAny for AnyValue {
+  fn to_any(&self) -> Any {
+    Any::from_value(self.clone())
   }
 }
