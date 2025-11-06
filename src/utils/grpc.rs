@@ -14,6 +14,143 @@ pub enum AnyValue {
   Unknown(Vec<u8>),
 }
 
+impl AnyValue {
+  pub fn from_string(s: String) -> Self {
+    AnyValue::String(s)
+  }
+
+  pub fn from_str(s: &str) -> Self {
+    AnyValue::String(s.to_string())
+  }
+
+  pub fn from_bool(b: bool) -> Self {
+    AnyValue::Bool(b)
+  }
+
+  pub fn from_int32(i: i32) -> Self {
+    AnyValue::Int32(i)
+  }
+
+  pub fn from_int64(i: i64) -> Self {
+    AnyValue::Int64(i)
+  }
+
+  pub fn from_float(f: f32) -> Self {
+    AnyValue::Float(f)
+  }
+
+  pub fn from_double(d: f64) -> Self {
+    AnyValue::Double(d)
+  }
+
+  pub fn from_bytes(bytes: Vec<u8>) -> Self {
+    AnyValue::Bytes(bytes)
+  }
+
+  pub fn from_slice(slice: &[u8]) -> Self {
+    AnyValue::Bytes(slice.to_vec())
+  }
+
+  pub fn from_unknown(bytes: Vec<u8>) -> Self {
+    AnyValue::Unknown(bytes)
+  }
+
+  // Convenience method to create from any type that implements Into<Vec<u8>>
+  pub fn from_unknown_slice(slice: &[u8]) -> Self {
+    AnyValue::Unknown(slice.to_vec())
+  }
+
+  // Try to convert to specific types (useful for extracting values)
+  pub fn as_string(&self) -> Option<&String> {
+    match self {
+      AnyValue::String(s) => Some(s),
+      _ => None,
+    }
+  }
+
+  pub fn as_bool(&self) -> Option<bool> {
+    match self {
+      AnyValue::Bool(b) => Some(*b),
+      _ => None,
+    }
+  }
+
+  pub fn as_int32(&self) -> Option<i32> {
+    match self {
+      AnyValue::Int32(i) => Some(*i),
+      _ => None,
+    }
+  }
+
+  pub fn as_int64(&self) -> Option<i64> {
+    match self {
+      AnyValue::Int64(i) => Some(*i),
+      _ => None,
+    }
+  }
+
+  pub fn as_float(&self) -> Option<f32> {
+    match self {
+      AnyValue::Float(f) => Some(*f),
+      _ => None,
+    }
+  }
+
+  pub fn as_double(&self) -> Option<f64> {
+    match self {
+      AnyValue::Double(d) => Some(*d),
+      _ => None,
+    }
+  }
+
+  pub fn as_bytes(&self) -> Option<&Vec<u8>> {
+    match self {
+      AnyValue::Bytes(bytes) => Some(bytes),
+      _ => None,
+    }
+  }
+
+  pub fn as_unknown(&self) -> Option<&Vec<u8>> {
+    match self {
+      AnyValue::Unknown(bytes) => Some(bytes),
+      _ => None,
+    }
+  }
+
+  // Check the type of the value
+  pub fn is_string(&self) -> bool {
+    matches!(self, AnyValue::String(_))
+  }
+
+  pub fn is_bool(&self) -> bool {
+    matches!(self, AnyValue::Bool(_))
+  }
+
+  pub fn is_int32(&self) -> bool {
+    matches!(self, AnyValue::Int32(_))
+  }
+
+  pub fn is_int64(&self) -> bool {
+    matches!(self, AnyValue::Int64(_))
+  }
+
+  pub fn is_float(&self) -> bool {
+    matches!(self, AnyValue::Float(_))
+  }
+
+  pub fn is_double(&self) -> bool {
+    matches!(self, AnyValue::Double(_))
+  }
+
+  pub fn is_bytes(&self) -> bool {
+    matches!(self, AnyValue::Bytes(_))
+  }
+
+  pub fn is_unknown(&self) -> bool {
+    matches!(self, AnyValue::Unknown(_))
+  }
+}
+
 pub fn grpc_deserialize_any(any: &Any) -> AnyValue {
   match any.type_url.as_str() {
     "type.googleapis.com/google.protobuf.StringValue" => String::from_utf8(any.value.clone())
