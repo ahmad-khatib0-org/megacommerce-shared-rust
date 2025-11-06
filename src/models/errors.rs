@@ -14,7 +14,10 @@ use super::{
 pub type BoxedErr = Box<dyn Error + Sync + Send>;
 pub type OptionalErr = Option<BoxedErr>;
 pub type OptionalParams = Option<HashMap<String, Value>>;
+
 pub const MSG_ID_ERR_INTERNAL: &str = "server.internal.error";
+pub const MSG_ERR_INTERNAL: &str =
+  "Sorry, Unexpected internal server error. Our team has been notified. Please try again";
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
