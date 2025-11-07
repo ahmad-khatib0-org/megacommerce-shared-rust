@@ -266,6 +266,13 @@ impl AppError {
       }
     }
 
+    let mut errors: HashMap<String, String> = HashMap::new();
+    for (key, value) in self.errors_internal.clone().unwrap_or_default().iter() {
+      let result =
+        tr(&self.ctx.accept_language(), &value.id, value.params.clone()).unwrap_or_default();
+      errors.insert(key.to_string(), result);
+    }
+
     AppErrorProto {
       id: self.id.clone(),
       r#where: self.path.clone(),
@@ -274,7 +281,7 @@ impl AppError {
       status_code: self.status_code as i32,
       skip_translation: self.skip_translation,
       request_id: self.request_id.clone().unwrap_or_default(),
-      errors: Some(StringMap { values: self.errors.clone().unwrap_or_default() }),
+      errors: Some(StringMap { values: errors }),
       errors_nested: Some(NestedStringMap { data: nested }),
     }
   }
