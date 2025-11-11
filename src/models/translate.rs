@@ -82,10 +82,14 @@ impl TemplatePool {
 
 static TRANSLATION_STORE: OnceLock<HashMap<String, HashMap<String, Arc<Mutex<TemplatePool>>>>> =
   OnceLock::new();
+static DEFAULT_LANGUAGE: OnceLock<String> = OnceLock::new();
+static AVAILABLE_LANGUAGES: OnceLock<Vec<String>> = OnceLock::new();
 
 pub fn translations_init(
   trans: HashMap<String, TranslationElements>,
   max_pool_size: usize,
+  default_language: String,
+  available_languages: Vec<String>,
 ) -> Result<(), TranslationError> {
   let parsed = parse_translations_grpc_respones(trans);
   let mut store = HashMap::new();
@@ -99,9 +103,9 @@ pub fn translations_init(
     store.insert(lang, lang_map);
   }
 
-  TRANSLATION_STORE
-    .set(store)
-    .map_err(|_| TranslationError::NotInitialized)
+  AVAILABLE_LANGUAGES.set(available_languages).map_err(|_| TranslationError::NotInitialized)?;
+  DEFAULT_LANGUAGE.set(default_language.clone()).map_err(|_| TranslationError::NotInitialized)?;
+  TRANSLATION_STORE.set(store).map_err(|_| TranslationError::NotInitialized)
 }
 
 pub fn tr<P: Serialize>(
@@ -109,9 +113,12 @@ pub fn tr<P: Serialize>(
   id: &str,
   params: Option<P>,
 ) -> Result<String, TranslationError> {
-  let store = TRANSLATION_STORE
-    .get()
-    .ok_or(TranslationError::NotInitialized)?;
+  let store = TRANSLATION_STORE.get().ok_or(TranslationError::NotInitialized)?;
+
+  let mut lang = lang;
+  if !AVAILABLE_LANGUAGES.get().unwrap_or(&vec![]).contains(&lang.to_string()) {
+    lang = DEFAULT_LANGUAGE.get().unwrap();
+  }
 
   let pool = store
     .get(lang)
