@@ -32,6 +32,7 @@ pub enum ErrorType {
   Privileges,
   Internal,
   DBConnectionError,
+  DBSelectError,
   DBInsertError,
   DBUpdateError,
   DBDeleteError,
@@ -52,6 +53,7 @@ impl fmt::Display for ErrorType {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       ErrorType::DBConnectionError => write!(f, "db_connection_error"),
+      ErrorType::DBSelectError => write!(f, "db_select_error"),
       ErrorType::DBInsertError => write!(f, "db_insert_error"),
       ErrorType::DBUpdateError => write!(f, "db_update_error"),
       ErrorType::DBDeleteError => write!(f, "db_delete_error"),
