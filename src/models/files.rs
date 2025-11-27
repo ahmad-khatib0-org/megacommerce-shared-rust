@@ -94,7 +94,7 @@ mod tests {
 
   #[test]
   fn test_invalid_checksum() {
-    let (base64, expected_hash, _) = get_test_data();
+    let (base64, _, _) = get_test_data();
     let wrong_hash = "0000000000000000000000000000000000000000000000000000000000000000";
 
     let result = validate_base64_checksum(&base64, wrong_hash, None).unwrap();
@@ -187,7 +187,7 @@ mod tests {
   #[test]
   fn test_known_hash_value() {
     let base64_data = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
-    let expected_hash = "1c30f1a2686fbf86c76c9115b471df8c0b6b9c5b6c5e2c7b8c5c6c5c6c5c6c5c6c5"; // This will be the actual hash
+    let _ = "1c30f1a2686fbf86c76c9115b471df8c0b6b9c5b6c5e2c7b8c5c6c5c6c5c6c5c6c5"; // This will be the actual hash
 
     // First, let's see what the actual hash is
     let decoded = STANDARD.decode(base64_data).unwrap();

@@ -62,6 +62,7 @@ pub struct Context {
   pub path: String,
   pub user_agent: String,
   pub accept_language: String,
+  pub timezone: String,
 }
 
 impl Context {
@@ -73,8 +74,18 @@ impl Context {
     path: String,
     user_agent: String,
     accept_language: String,
+    timezone: String,
   ) -> Self {
-    Self { session, request_id, ip_address, x_forwarded_for, path, user_agent, accept_language }
+    Self {
+      session,
+      request_id,
+      ip_address,
+      x_forwarded_for,
+      path,
+      user_agent,
+      accept_language,
+      timezone,
+    }
   }
 
   pub fn clone(&self) -> Self {
@@ -86,6 +97,7 @@ impl Context {
       path: self.path.clone(),
       user_agent: self.user_agent.clone(),
       accept_language: self.accept_language.clone(),
+      timezone: self.timezone.clone(),
     }
   }
 

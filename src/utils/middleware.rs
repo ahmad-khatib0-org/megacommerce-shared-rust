@@ -39,26 +39,27 @@ pub fn middleware_context(mut req: Request<()>) -> Result<Request<()>, Status> {
 
   let context = {
     let session = Session {
-      id: get_string(&Header::SessionId.as_str()),
-      token: get_string(&Header::Token.as_str()),
-      created_at: get_int(&Header::CreatedAt.as_str()),
-      expires_at: get_int(&Header::ExpiresAt.as_str()),
-      last_activity_at: get_int(&Header::LastActivityAt.as_str()),
-      user_id: get_string(&Header::UserId.as_str()),
-      device_id: get_string(&Header::DeviceId.as_str()),
-      roles: get_string(&Header::Roles.as_str()),
-      is_oauth: get_bool(&Header::IsOauth.as_str()),
-      props: get_props(&Header::Props.as_str()),
+      id: get_string(Header::XSessionID.as_str()),
+      token: get_string(Header::Authorization.as_str()),
+      created_at: get_int(Header::XSessionCreatedAt.as_str()),
+      expires_at: get_int(Header::XSessionExpiresAt.as_str()),
+      last_activity_at: get_int(Header::XLastActivityAt.as_str()),
+      user_id: get_string(Header::XUserID.as_str()),
+      device_id: get_string(Header::XDeviceID.as_str()),
+      roles: get_string(Header::XRoles.as_str()),
+      is_oauth: get_bool(Header::XIsOAuth.as_str()),
+      props: get_props(Header::XProps.as_str()),
     };
 
     Context::new(
       session,
-      get_string(Header::XRequestId.as_str()),
-      get_string(Header::XIpAddress.as_str()),
+      get_string(Header::XRequestID.as_str()),
+      get_string(Header::XIPAddress.as_str()),
       get_string(Header::XForwardedFor.as_str()),
-      get_string(Header::Path.as_str()),
+      get_string(":path"),
       get_string(Header::UserAgent.as_str()),
       get_string(Header::AcceptLanguage.as_str()),
+      get_string(Header::XTimezone.as_str()),
     )
   };
 
