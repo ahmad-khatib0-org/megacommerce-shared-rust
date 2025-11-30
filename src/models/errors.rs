@@ -23,6 +23,7 @@ pub const MSG_ERR_INTERNAL: &str =
 #[serde(rename_all = "snake_case")]
 pub enum ErrorType {
   NoRows,
+  NotFound,
   UniqueViolation,
   ForeignKeyViolation,
   NotNullViolation,
@@ -52,6 +53,7 @@ pub enum ErrorType {
 impl fmt::Display for ErrorType {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
+      ErrorType::NotFound => write!(f, "not_found"),
       ErrorType::DBConnectionError => write!(f, "db_connection_error"),
       ErrorType::DBSelectError => write!(f, "db_select_error"),
       ErrorType::DBInsertError => write!(f, "db_insert_error"),
